@@ -2,7 +2,21 @@
 backend/target/
 .idea/
 *.iml
+# Maven
+**/target/
 
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# Environment and secrets
+**/application.properties
+.env
+
+# OS
+.DS_Store
+Thumbs.db
 # Node.js (Frontend)
 frontend/node_modules/
 frontend/dist/
