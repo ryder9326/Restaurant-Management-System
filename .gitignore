@@ -11,6 +11,7 @@ backend/target/
 out/
 
 # Environment and secrets
+application-dev.properties
 **/application.properties
 .env
 
