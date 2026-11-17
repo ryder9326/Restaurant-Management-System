@@ -15,6 +15,7 @@ import restaurant.common.exception.ErrorCode;
 import restaurant.common.exception.ResourceNotFoundException;
 import restaurant.common.response.PageResponse;
 import restaurant.common.security.CustomUserDetails;
+import restaurant.common.service.CodeGeneratorService;
 import restaurant.modules.auth.enums.Role;
 import restaurant.modules.hr.dto.ActiveTableServiceProjection;
 import restaurant.modules.hr.dto.CaLamViecDTO;
@@ -52,6 +53,7 @@ public class NhanVienServiceImpl implements NhanVienService {
     private final KhachHangRepository khachHangRepository;
     private final NhanVienMapper nhanVienMapper;
     private final PasswordEncoder passwordEncoder;
+    private final CodeGeneratorService codeGeneratorService;
 
     /**
      * Tạo mới hồ sơ nhân viên: kiểm tra phân cấp quyền hạn (chặn {@code ROLE_MANAGER} tạo tài khoản
@@ -62,14 +64,15 @@ public class NhanVienServiceImpl implements NhanVienService {
     public NhanVienResponseDTO createNhanVien(NhanVienRequestDTO dto) {
         enforceRoleHierarchyPermission(dto.getChucVu(), null);
 
-        if (nhanVienRepository.existsById(dto.getMaNV())) {
-            throw new BusinessConflictException("Mã nhân viên '" + dto.getMaNV() + "' đã tồn tại");
+        String maNV = codeGeneratorService.generateCode("NV");
+        if (nhanVienRepository.existsById(maNV)) {
+            throw new BusinessConflictException("Mã nhân viên '" + maNV + "' đã tồn tại");
         }
         if (StringUtils.hasText(dto.getUsername()) && nhanVienRepository.existsByUsername(dto.getUsername())) {
             throw new BusinessConflictException("Tên đăng nhập '" + dto.getUsername() + "' đã được sử dụng");
         }
 
-        NhanVien nhanVien = nhanVienMapper.toEntity(dto);
+        NhanVien nhanVien = nhanVienMapper.toEntity(dto, maNV);
         if (StringUtils.hasText(dto.getPassword())) {
             nhanVien.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
         }
