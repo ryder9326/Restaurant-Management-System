@@ -27,14 +27,17 @@ public class ThucDon {
     @Column(name = "MaMon", length = 20, nullable = false)
     private String maMon;
 
-    @Column(name = "TenMon", length = 100, nullable = false)
+    @Column(name = "TenMon", length = 150, nullable = false)
     private String tenMon;
 
-    @Column(name = "MoTa", length = 500)
+    @Column(name = "MoTa", columnDefinition = "TEXT")
     private String moTa;
 
     @Column(name = "GiaBan", precision = 15, scale = 2, nullable = false)
     private BigDecimal giaBan;
+
+    @Column(name = "TrangThaiMon", length = 50)
+    private String trangThaiMon;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

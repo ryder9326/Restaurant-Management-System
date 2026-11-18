@@ -2,9 +2,8 @@ package restaurant.modules.hr.entity.id;
 
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.*;
 import restaurant.modules.hr.enums.BuoiLamViec;
 
@@ -27,8 +26,8 @@ public class CaLamViecId implements Serializable {
     @Column(name = "MaNV", length = 20, nullable = false)
     private String maNV;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "BuoiLamViec", length = 30, nullable = false)
+    @Convert(converter = restaurant.modules.hr.converter.BuoiLamViecConverter.class)
+    @Column(name = "BuoiLamViec", length = 50, nullable = false)
     private BuoiLamViec buoiLamViec;
 
     @Column(name = "NgayLamViec", nullable = false)

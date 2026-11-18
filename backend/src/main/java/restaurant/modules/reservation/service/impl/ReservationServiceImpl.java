@@ -148,7 +148,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         DatBan datBan = DatBan.builder()
                 .maDatBan(dto.getMaDatBan())
-                .khachHang(khachHang)
+                .danhSachKhachHang(new HashSet<>(List.of(khachHang)))
                 .banAn(banAn)
                 .thoiGianDat(dto.getThoiGianDat())
                 .soLuongKhach(dto.getSoLuongKhach())

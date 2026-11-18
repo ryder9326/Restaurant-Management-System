@@ -5,7 +5,6 @@ import lombok.*;
 import restaurant.modules.billing.entity.id.MonAnTrongHoaDonId;
 import restaurant.modules.menuorder.entity.ThucDon;
 
-import java.math.BigDecimal;
 
 /**
  * Thực thể ánh xạ bảng trung gian {@code monantronghoadon} lưu số lượng và đơn giá tại thời điểm bán.
@@ -37,6 +36,4 @@ public class MonAnTrongHoaDon {
     @Column(name = "SoLuong", nullable = false)
     private Integer soLuong;
 
-    @Column(name = "DonGiaLucBan", precision = 15, scale = 2)
-    private BigDecimal donGiaLucBan;
 }

@@ -26,21 +26,26 @@ public class DatBan {
     @Column(name = "MaDatBan", length = 20, nullable = false)
     private String maDatBan;
 
-    @Column(name = "ThoiGianDat", nullable = false)
+    @Column(name = "ThoiGianDat")
     private LocalDateTime thoiGianDat;
 
-    @Column(name = "SoLuongKhach", nullable = false)
+    @Column(name = "SoLuongKhach")
     private Integer soLuongKhach;
 
-    @Column(name = "GhiChu", length = 255)
+    @Column(name = "GhiChu", columnDefinition = "TEXT")
     private String ghiChu;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MaKH", nullable = false)
-    private KhachHang khachHang;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "dattruoc",
+            joinColumns = @JoinColumn(name = "MaDatBan"),
+            inverseJoinColumns = @JoinColumn(name = "MaKH")
+    )
+    @Builder.Default
+    private Set<KhachHang> danhSachKhachHang = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MaBan", nullable = false)
+    @JoinColumn(name = "MaBan")
     private BanAn banAn;
 
     @ManyToMany(mappedBy = "danhSachDatBan", fetch = FetchType.LAZY)

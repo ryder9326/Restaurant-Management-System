@@ -28,7 +28,7 @@ import restaurant.modules.reservation.repository.DatBanRepository;
 import restaurant.modules.reservation.repository.KhachHangRepository;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -61,7 +61,7 @@ public class BillingAndAnalyticsServiceImpl implements BillingAndAnalyticsServic
         if (giamGiaRepository.existsById(dto.getMaGiamGia())) {
             throw new BusinessConflictException("Mã giảm giá '" + dto.getMaGiamGia() + "' đã tồn tại");
         }
-        if (dto.getThoiHan().isBefore(LocalDate.now())) {
+        if (dto.getThoiHan() != null && dto.getThoiHan().isBefore(LocalDateTime.now())) {
             throw new BusinessConflictException(
                     ErrorCode.EXPIRED_DISCOUNT_VOUCHER,
                     "Thời hạn mã giảm giá không được nhỏ hơn ngày hiện tại"
@@ -75,14 +75,14 @@ public class BillingAndAnalyticsServiceImpl implements BillingAndAnalyticsServic
     @Override
     @Transactional(readOnly = true)
     public List<GiamGiaDTO> getActiveDiscounts() {
-        return giamGiaRepository.findByThoiHanGreaterThanEqual(LocalDate.now()).stream()
+        return giamGiaRepository.findByThoiHanGreaterThanEqual(LocalDateTime.now()).stream()
                 .map(hoaDonMapper::toDTO)
                 .toList();
     }
 
     /**
-     * Lập hóa đơn mới ({@code HoaDon}): ghi nhận đơn giá tại thời điểm bán ({@code donGiaLucBan})
-     * cho từng món ăn, kiểm tra điều kiện giá trị đơn tối thiểu của các mã giảm giá trước khi khấu trừ.
+     * Lập hóa đơn mới ({@code HoaDon}) từ các đặt bàn và món ăn, kiểm tra điều kiện giá trị đơn tối thiểu
+     * của các mã giảm giá trước khi khấu trừ.
      */
     @Override
     @Transactional
@@ -115,8 +115,7 @@ public class BillingAndAnalyticsServiceImpl implements BillingAndAnalyticsServic
             ThucDon thucDon = thucDonRepository.findById(maMon)
                     .orElseThrow(() -> new ResourceNotFoundException("ThucDon", "maMon", maMon));
 
-            BigDecimal snapshotPrice = thucDon.getGiaBan();
-            BigDecimal lineTotal = snapshotPrice.multiply(BigDecimal.valueOf(quantity));
+            BigDecimal lineTotal = thucDon.getGiaBan().multiply(BigDecimal.valueOf(quantity));
             grossAmount = grossAmount.add(lineTotal);
 
             MonAnTrongHoaDon lineItem = MonAnTrongHoaDon.builder()
@@ -124,7 +123,6 @@ public class BillingAndAnalyticsServiceImpl implements BillingAndAnalyticsServic
                     .hoaDon(hoaDon)
                     .thucDon(thucDon)
                     .soLuong(quantity)
-                    .donGiaLucBan(snapshotPrice)
                     .build();
             lineItems.add(lineItem);
         }
@@ -217,7 +215,8 @@ public class BillingAndAnalyticsServiceImpl implements BillingAndAnalyticsServic
             return;
         }
         boolean isOwner = hoaDon.getDanhSachDatBan().stream()
-                .anyMatch(db -> db.getKhachHang().getMaKH().equals(khachHang.getMaKH()));
+                .anyMatch(db -> db.getDanhSachKhachHang().stream()
+                        .anyMatch(customer -> customer.getMaKH().equals(khachHang.getMaKH())));
         if (!isOwner) {
             throw new BusinessConflictException(
                     ErrorCode.INVALID_PAYMENT_STATE,
@@ -229,10 +228,7 @@ public class BillingAndAnalyticsServiceImpl implements BillingAndAnalyticsServic
     private BigDecimal calculateGrossAmount(HoaDon hoaDon) {
         return hoaDon.getChiTietMonAn().stream()
                 .map(item -> {
-                    BigDecimal price = item.getDonGiaLucBan() != null
-                            ? item.getDonGiaLucBan()
-                            : item.getThucDon().getGiaBan();
-                    return price.multiply(BigDecimal.valueOf(item.getSoLuong()));
+                    return item.getThucDon().getGiaBan().multiply(BigDecimal.valueOf(item.getSoLuong()));
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -249,9 +245,9 @@ public class BillingAndAnalyticsServiceImpl implements BillingAndAnalyticsServic
             throw new ResourceNotFoundException("Một hoặc nhiều mã giảm giá không tồn tại");
         }
 
-        LocalDate today = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
         for (GiamGia discount : discounts) {
-            if (discount.getThoiHan().isBefore(today)) {
+            if (discount.getThoiHan() != null && discount.getThoiHan().isBefore(now)) {
                 throw new BusinessConflictException(
                         ErrorCode.EXPIRED_DISCOUNT_VOUCHER,
                         "Mã giảm giá '" + discount.getMaGiamGia() + "' đã hết hạn sử dụng"
@@ -346,9 +342,9 @@ public class BillingAndAnalyticsServiceImpl implements BillingAndAnalyticsServic
             throw new ResourceNotFoundException("Một hoặc nhiều mã giảm giá không tồn tại");
         }
 
-        LocalDate today = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
         for (GiamGia discount : discounts) {
-            if (discount.getThoiHan().isBefore(today)) {
+            if (discount.getThoiHan() != null && discount.getThoiHan().isBefore(now)) {
                 throw new BusinessConflictException(
                         ErrorCode.EXPIRED_DISCOUNT_VOUCHER,
                         "Mã giảm giá '" + discount.getMaGiamGia() + "' đã hết hạn sử dụng"

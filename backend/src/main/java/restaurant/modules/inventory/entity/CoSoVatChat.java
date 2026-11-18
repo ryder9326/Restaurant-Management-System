@@ -25,10 +25,10 @@ public class CoSoVatChat {
     @Column(name = "MaTaiSan", length = 20, nullable = false)
     private String maTaiSan;
 
-    @Column(name = "TenTaiSan", length = 100, nullable = false)
+    @Column(name = "TenTaiSan", length = 150, nullable = false)
     private String tenTaiSan;
 
-    @Column(name = "TinhTrang", length = 50, nullable = false)
+    @Column(name = "TinhTrang", length = 100)
     private String tinhTrang;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,7 +40,7 @@ public class CoSoVatChat {
             name = "cungcapcsvc",
             joinColumns = @JoinColumn(name = "MaTaiSan")
     )
-    @Column(name = "TenNhaCungCap", length = 100, nullable = false)
+    @Column(name = "TenNhaCungCap", length = 150, nullable = false)
     @Builder.Default
     private Set<String> nhaCungCap = new HashSet<>();
 }

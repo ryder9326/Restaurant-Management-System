@@ -4,7 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Đối tượng truyền tải dữ liệu quản lý chương trình khuyến mãi và mã giảm giá.
@@ -26,9 +26,8 @@ public class GiamGiaDTO {
     @DecimalMin(value = "0.0", inclusive = false, message = "Giá trị ưu đãi phải lớn hơn 0")
     private BigDecimal giaTriUuDai;
 
-    @Size(max = 255, message = "Điều kiện áp dụng tối đa 255 ký tự")
     private String dieuKienApDung;
 
     @NotNull(message = "Thời hạn sử dụng không được để trống")
-    private LocalDate thoiHan;
+    private LocalDateTime thoiHan;
 }

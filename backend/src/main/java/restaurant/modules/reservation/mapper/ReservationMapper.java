@@ -55,7 +55,7 @@ public class ReservationMapper {
     public DatBanRequestDTO toDTO(DatBan entity) {
         return DatBanRequestDTO.builder()
                 .maDatBan(entity.getMaDatBan())
-                .maKH(entity.getKhachHang().getMaKH())
+                .maKH(entity.getDanhSachKhachHang().stream().findFirst().map(KhachHang::getMaKH).orElse(null))
                 .maBan(entity.getBanAn().getMaBan())
                 .thoiGianDat(entity.getThoiGianDat())
                 .soLuongKhach(entity.getSoLuongKhach())

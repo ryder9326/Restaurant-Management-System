@@ -24,22 +24,17 @@ Trong mỗi phân hệ, luồng xử lý chính là:
 
 Yêu cầu: JDK 21, Maven và MySQL.
 
-1. Tạo/cấu hình database MySQL. Khi bật Flyway, migration trong `src/main/resources/db/migration` tạo cấu trúc và dữ liệu mẫu.
-2. Thiết lập `JWT_SECRET` là chuỗi Base64 có độ dài sau giải mã tối thiểu 32 byte. Cấu hình database trong `application-dev.properties` hoặc qua biến môi trường `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`.
+1. Tạo database rỗng `quanlynhahang` với charset `utf8mb4` và collation `utf8mb4_unicode_ci`.
+2. Đặt `JWT_SECRET` thành chuỗi Base64 có ít nhất 32 byte sau khi giải mã. Có thể cấu hình kết nối qua `DB_URL`, `DB_USERNAME` và `DB_PASSWORD`; mặc định ứng dụng kết nối `quanlynhahang`.
 3. Chạy từ thư mục `backend`:
 
    ```powershell
    mvn spring-boot:run "-Dspring-boot.run.profiles=dev"
    ```
 
-   Hoặc build:
+Flyway chỉ có migration `V1__initialize_quanlynhahang.sql`, chứa schema từ `database/schema.sql` và dữ liệu từ `database/seed.sql`. Không nạp hai file nguồn thủ công trước khi chạy Flyway. Mật khẩu mẫu `123456` được lưu dưới dạng BCrypt để tương thích với Spring Security.
 
-   ```powershell
-   mvn clean package
-   ```
-
-Không đưa mật khẩu database hoặc JWT secret thật lên Git; file cấu hình `dev` chỉ dùng cho môi trường cá nhân.
-
+Không đưa mật khẩu database hoặc JWT secret thật lên Git.
 ## API
 
 - Base URL mặc định: `http://localhost:8080/api/v1`

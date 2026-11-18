@@ -29,6 +29,5 @@ public class KhachHangDTO {
     @Pattern(regexp = "^(0|\\+84)[0-9]{8,10}$", message = "Số điện thoại không đúng định dạng Việt Nam")
     private String sdt;
 
-    @Size(max = 255, message = "Ghi chú tối đa 255 ký tự")
     private String ghiChu;
 }

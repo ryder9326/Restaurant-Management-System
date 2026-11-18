@@ -35,6 +35,5 @@ public class DatBanRequestDTO {
     @Min(value = 1, message = "Số lượng khách phải từ 1 người trở lên")
     private Integer soLuongKhach;
 
-    @Size(max = 255, message = "Ghi chú tối đa 255 ký tự")
     private String ghiChu;
 }

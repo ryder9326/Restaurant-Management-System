@@ -63,7 +63,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, String> {
         LEFT JOIN FETCH ct.thucDon
         LEFT JOIN FETCH hd.danhSachGiamGia
         LEFT JOIN FETCH hd.danhSachDatBan db
-        LEFT JOIN FETCH db.khachHang
+        LEFT JOIN FETCH db.danhSachKhachHang
         WHERE hd.maHD = :maHD
     """)
     Optional<HoaDon> findDetailByMaHDForUpdate(@Param("maHD") String maHD);

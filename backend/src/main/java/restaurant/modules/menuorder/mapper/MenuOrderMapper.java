@@ -26,6 +26,7 @@ public class MenuOrderMapper {
                 .tenMon(dto.getTenMon())
                 .moTa(dto.getMoTa())
                 .giaBan(dto.getGiaBan())
+                .trangThaiMon(dto.getTrangThaiMon() == null ? "Đang bán" : dto.getTrangThaiMon())
                 .danhSachNguyenLieu(ingredients)
                 .build();
     }
@@ -36,6 +37,7 @@ public class MenuOrderMapper {
                 .tenMon(entity.getTenMon())
                 .moTa(entity.getMoTa())
                 .giaBan(entity.getGiaBan())
+                .trangThaiMon(entity.getTrangThaiMon())
                 .maNguyenLieuList(entity.getDanhSachNguyenLieu() == null
                         ? Collections.emptySet()
                         : entity.getDanhSachNguyenLieu().stream()

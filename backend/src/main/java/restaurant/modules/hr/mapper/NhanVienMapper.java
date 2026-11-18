@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 @Component
 public class NhanVienMapper {
 
-    public NhanVien toEntity(NhanVienRequestDTO dto, String generatedMaNV) {
+    public NhanVien toEntity(NhanVienRequestDTO dto) {
         return NhanVien.builder()
-                .maNV(generatedMaNV)
+                .maNV(dto.getMaNV())
                 .hoVaTen(dto.getHoVaTen())
                 .tuoi(dto.getTuoi())
                 .chucVu(dto.getChucVu())

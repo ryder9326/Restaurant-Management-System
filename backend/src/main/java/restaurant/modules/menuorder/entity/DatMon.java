@@ -36,10 +36,10 @@ public class DatMon {
     @Column(name = "SoLuong", nullable = false)
     private Integer soLuong;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "TrangThai", length = 30, nullable = false)
+    @Convert(converter = restaurant.modules.menuorder.converter.TrangThaiDatMonConverter.class)
+    @Column(name = "TrangThai", length = 50)
     private TrangThaiDatMon trangThai;
 
-    @Column(name = "GhiChu", length = 255)
+    @Column(name = "GhiChu", columnDefinition = "TEXT")
     private String ghiChu;
 }

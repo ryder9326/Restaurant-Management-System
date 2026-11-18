@@ -28,6 +28,5 @@ public class DatMonRequestDTO {
     @Min(value = 1, message = "Số lượng gọi món phải từ 1 trở lên")
     private Integer soLuong;
 
-    @Size(max = 255, message = "Ghi chú chế biến tối đa 255 ký tự")
     private String ghiChu;
 }

@@ -36,14 +36,14 @@ public class ThanhToan {
     @JoinColumn(name = "MaHD", nullable = false)
     private HoaDon hoaDon;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "PhuongThuc", length = 30, nullable = false)
+    @Convert(converter = restaurant.modules.billing.converter.PhuongThucThanhToanConverter.class)
+    @Column(name = "PhuongThuc", length = 100)
     private PhuongThucThanhToan phuongThuc;
 
-    @Column(name = "GiamGia", precision = 15, scale = 2, nullable = false)
+    @Column(name = "GiamGia", precision = 15, scale = 2)
     private BigDecimal giamGia;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "TrangThai", length = 30, nullable = false)
+    @Convert(converter = restaurant.modules.billing.converter.TrangThaiThanhToanConverter.class)
+    @Column(name = "TrangThai", length = 50)
     private TrangThaiThanhToan trangThai;
 }
