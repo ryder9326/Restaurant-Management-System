@@ -24,21 +24,18 @@ Trong mỗi phân hệ, luồng xử lý chính là:
 
 Yêu cầu: JDK 21, Maven và MySQL.
 
-1. Tạo/cấu hình database MySQL. Khi bật Flyway, migration trong `src/main/resources/db/migration` tạo cấu trúc và dữ liệu mẫu.
-2. Thiết lập `JWT_SECRET` là chuỗi Base64 có độ dài sau giải mã tối thiểu 32 byte. Cấu hình database trong `application-dev.properties` hoặc qua biến môi trường `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`.
-3. Chạy từ thư mục `backend`:
+1. Tạo database rỗng `quanlynhahang` với charset `utf8mb4` và collation `utf8mb4_unicode_ci`.
+2. Kết nối database với dự án thông qua database trong itelij ở thanh công cụ bên phải (nhập tên, mật khẩu database đã tạo) -> test connection -> Apply -> OK
+3. Đặt mật khẩu cho password database trong application-dev.properties và application.properties 
+4. Chuột phải vào thư mục pom.xml -> chọn As a Maven project sau đó ở thanh công cụ bên phải ấn vào biểu tượng m (Maven) -> Reload All Maven Project
+5. Run -> Edit Configurations -> Active Profies -> Nhập chuỗi "dev" -> Apply 
+6. Run RestaurantApplication.java
 
    ```powershell
    mvn spring-boot:run "-Dspring-boot.run.profiles=dev"
    ```
 
-   Hoặc build:
-
-   ```powershell
-   mvn clean package
-   ```
-
-Không đưa mật khẩu database hoặc JWT secret thật lên Git; file cấu hình `dev` chỉ dùng cho môi trường cá nhân.
+Flyway chỉ có migration `V1__initialize_quanlynhahang.sql`, chứa schema từ `database/schema.sql` và dữ liệu từ `database/seed.sql`. Không nạp hai file nguồn thủ công trước khi chạy Flyway. Mật khẩu mẫu `123456` được lưu dưới dạng BCrypt để tương thích với Spring Security.
 
 ## API
 
@@ -53,3 +50,4 @@ Không đưa mật khẩu database hoặc JWT secret thật lên Git; file cấu
 - Dùng DTO cho dữ liệu API, không trả Entity trực tiếp.
 - Đánh dấu giao dịch ghi dữ liệu bằng `@Transactional`; thêm thay đổi schema bằng migration Flyway mới, không sửa migration đã chạy ở môi trường dùng chung.
 - Bổ sung kiểm tra đầu vào, phân quyền và kiểm thử cho hành vi mới.
+

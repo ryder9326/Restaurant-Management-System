@@ -5,7 +5,7 @@ import lombok.*;
 import restaurant.modules.reservation.entity.KhachHang;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,14 +27,14 @@ public class GiamGia {
     @Column(name = "MaGiamGia", length = 20, nullable = false)
     private String maGiamGia;
 
-    @Column(name = "GiaTriUuDai", precision = 15, scale = 2, nullable = false)
+    @Column(name = "GiaTriUuDai", precision = 15, scale = 2)
     private BigDecimal giaTriUuDai;
 
-    @Column(name = "DieuKienApDung", length = 255)
+    @Column(name = "DieuKienApDung", columnDefinition = "TEXT")
     private String dieuKienApDung;
 
     @Column(name = "ThoiHan", nullable = false)
-    private LocalDate thoiHan;
+    private LocalDateTime thoiHan;
 
     @ManyToMany(mappedBy = "danhSachGiamGia", fetch = FetchType.LAZY)
     @Builder.Default

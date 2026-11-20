@@ -15,7 +15,6 @@ import restaurant.common.exception.ErrorCode;
 import restaurant.common.exception.ResourceNotFoundException;
 import restaurant.common.response.PageResponse;
 import restaurant.common.security.CustomUserDetails;
-import restaurant.common.service.CodeGeneratorService;
 import restaurant.modules.auth.enums.Role;
 import restaurant.modules.hr.dto.ActiveTableServiceProjection;
 import restaurant.modules.hr.dto.CaLamViecDTO;
@@ -35,6 +34,7 @@ import restaurant.modules.reservation.repository.BanAnRepository;
 import restaurant.modules.reservation.repository.KhachHangRepository;
 
 import java.time.LocalDate;
+import java.text.Normalizer;
 import java.util.List;
 
 /**
@@ -53,7 +53,6 @@ public class NhanVienServiceImpl implements NhanVienService {
     private final KhachHangRepository khachHangRepository;
     private final NhanVienMapper nhanVienMapper;
     private final PasswordEncoder passwordEncoder;
-    private final CodeGeneratorService codeGeneratorService;
 
     /**
      * Tạo mới hồ sơ nhân viên: kiểm tra phân cấp quyền hạn (chặn {@code ROLE_MANAGER} tạo tài khoản
@@ -64,15 +63,14 @@ public class NhanVienServiceImpl implements NhanVienService {
     public NhanVienResponseDTO createNhanVien(NhanVienRequestDTO dto) {
         enforceRoleHierarchyPermission(dto.getChucVu(), null);
 
-        String maNV = codeGeneratorService.generateCode("NV");
-        if (nhanVienRepository.existsById(maNV)) {
-            throw new BusinessConflictException("Mã nhân viên '" + maNV + "' đã tồn tại");
+        if (nhanVienRepository.existsById(dto.getMaNV())) {
+            throw new BusinessConflictException("Mã nhân viên '" + dto.getMaNV() + "' đã tồn tại");
         }
         if (StringUtils.hasText(dto.getUsername()) && nhanVienRepository.existsByUsername(dto.getUsername())) {
             throw new BusinessConflictException("Tên đăng nhập '" + dto.getUsername() + "' đã được sử dụng");
         }
 
-        NhanVien nhanVien = nhanVienMapper.toEntity(dto, maNV);
+        NhanVien nhanVien = nhanVienMapper.toEntity(dto);
         if (StringUtils.hasText(dto.getPassword())) {
             nhanVien.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
         }
@@ -255,10 +253,16 @@ public class NhanVienServiceImpl implements NhanVienService {
         if (!StringUtils.hasText(chucVu)) {
             return false;
         }
-        String normalized = chucVu.trim().toUpperCase();
+        String normalized = Normalizer.normalize(chucVu.trim(), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .replace('Đ', 'D')
+                .replace('đ', 'd')
+                .toUpperCase();
         return normalized.equals("ADMIN")
                 || normalized.equals("QUAN_TRI_VIEN")
+                || normalized.equals("QUAN TRI VIEN")
                 || normalized.equals("MANAGER")
-                || normalized.equals("QUAN_LY");
+                || normalized.equals("QUAN_LY")
+                || normalized.equals("QUAN LY");
     }
 }

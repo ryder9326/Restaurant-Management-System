@@ -37,20 +37,20 @@ public class NhanVien {
     @Column(name = "Tuoi")
     private Integer tuoi;
 
-    @Column(name = "ChucVu", length = 50, nullable = false)
+    @Column(name = "ChucVu", length = 100)
     private String chucVu;
 
     @Column(name = "NgayBatDau")
     private LocalDate ngayBatDau;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "TrangThaiLamViec", length = 30, nullable = false)
+    @Convert(converter = restaurant.modules.hr.converter.TrangThaiLamViecConverter.class)
+    @Column(name = "TrangThaiLamViec", length = 50)
     private TrangThaiLamViec trangThaiLamViec;
 
-    @Column(name = "Username", length = 50, unique = true)
+    @Column(name = "TaiKhoan", length = 50, unique = true)
     private String username;
 
-    @Column(name = "PasswordHash", length = 255)
+    @Column(name = "MatKhau", length = 255)
     private String passwordHash;
 
     @OneToMany(mappedBy = "nhanVien", cascade = CascadeType.ALL, orphanRemoval = true)

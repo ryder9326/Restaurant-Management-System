@@ -66,9 +66,7 @@ public class HoaDonMapper {
     }
 
     private HoaDonResponseDTO.ChiTietMonHoaDonDTO toChiTietMonDTO(MonAnTrongHoaDon item) {
-        BigDecimal donGia = item.getDonGiaLucBan() != null
-                ? item.getDonGiaLucBan()
-                : item.getThucDon().getGiaBan();
+        BigDecimal donGia = item.getThucDon().getGiaBan();
         BigDecimal thanhTien = donGia.multiply(BigDecimal.valueOf(item.getSoLuong()));
 
         return HoaDonResponseDTO.ChiTietMonHoaDonDTO.builder()

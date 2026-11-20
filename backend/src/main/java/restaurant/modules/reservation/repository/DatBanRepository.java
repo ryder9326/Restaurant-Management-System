@@ -36,7 +36,8 @@ public interface DatBanRepository extends JpaRepository<DatBan, String> {
                ba.KhuVuc AS khuVuc,
                db.ThoiGianDat AS thoiGianDat
         FROM datban db
-        JOIN khachhang kh ON db.MaKH = kh.MaKH
+        JOIN dattruoc dt ON db.MaDatBan = dt.MaDatBan
+        JOIN khachhang kh ON dt.MaKH = kh.MaKH
         JOIN banan ba ON db.MaBan = ba.MaBan
         ORDER BY db.ThoiGianDat DESC
     """, nativeQuery = true)

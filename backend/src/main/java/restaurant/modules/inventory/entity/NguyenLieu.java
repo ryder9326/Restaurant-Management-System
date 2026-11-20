@@ -28,13 +28,13 @@ public class NguyenLieu {
     @Column(name = "MaNguyenLieu", length = 20, nullable = false)
     private String maNguyenLieu;
 
-    @Column(name = "TenNguyenLieu", length = 100, nullable = false)
+    @Column(name = "TenNguyenLieu", length = 150, nullable = false)
     private String tenNguyenLieu;
 
-    @Column(name = "DonViTinh", length = 30, nullable = false)
+    @Column(name = "DonViTinh", length = 50)
     private String donViTinh;
 
-    @Column(name = "LuongTon", precision = 12, scale = 3, nullable = false)
+    @Column(name = "LuongTon", precision = 15, scale = 2)
     private BigDecimal luongTon;
 
     @Column(name = "HanSuDung")
@@ -49,7 +49,7 @@ public class NguyenLieu {
             name = "cungcapnl",
             joinColumns = @JoinColumn(name = "MaNguyenLieu")
     )
-    @Column(name = "TenNhaCungCap", length = 100, nullable = false)
+    @Column(name = "TenNhaCungCap", length = 150, nullable = false)
     @Builder.Default
     private Set<String> nhaCungCap = new HashSet<>();
 

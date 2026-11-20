@@ -24,11 +24,11 @@ public class CoSoVatChatDTO {
     private String maTaiSan;
 
     @NotBlank(message = "Tên tài sản không được để trống")
-    @Size(max = 100, message = "Tên tài sản tối đa 100 ký tự")
+    @Size(max = 150, message = "Tên tài sản tối đa 150 ký tự")
     private String tenTaiSan;
 
     @NotBlank(message = "Tình trạng tài sản không được để trống")
-    @Size(max = 50, message = "Tình trạng tối đa 50 ký tự")
+    @Size(max = 100, message = "Tình trạng tối đa 100 ký tự")
     private String tinhTrang;
 
     private String maNVQuanLy;

@@ -10,6 +10,7 @@ import restaurant.modules.auth.enums.Role;
 import restaurant.modules.hr.entity.NhanVien;
 import restaurant.modules.hr.enums.TrangThaiLamViec;
 
+import java.text.Normalizer;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,12 +44,17 @@ public class CustomUserDetails implements UserDetails {
         if (chucVu == null) {
             return Role.ROLE_WAITER;
         }
-        return switch (chucVu.trim().toUpperCase()) {
-            case "ADMIN", "QUAN_TRI_VIEN" -> Role.ROLE_ADMIN;
-            case "MANAGER", "QUAN_LY" -> Role.ROLE_MANAGER;
-            case "RECEPTIONIST", "LE_TAN" -> Role.ROLE_RECEPTIONIST;
-            case "CASHIER", "THU_NGAN" -> Role.ROLE_CASHIER;
-            case "INVENTORY_STAFF", "THU_KHO" -> Role.ROLE_INVENTORY_STAFF;
+        String normalized = Normalizer.normalize(chucVu.trim(), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .replace('Đ', 'D')
+                .replace('đ', 'd')
+                .toUpperCase();
+        return switch (normalized) {
+            case "ADMIN", "QUAN_TRI_VIEN", "QUAN TRI VIEN" -> Role.ROLE_ADMIN;
+            case "MANAGER", "QUAN_LY", "QUAN LY" -> Role.ROLE_MANAGER;
+            case "RECEPTIONIST", "LE_TAN", "LE TAN" -> Role.ROLE_RECEPTIONIST;
+            case "CASHIER", "THU_NGAN", "THU NGAN" -> Role.ROLE_CASHIER;
+            case "INVENTORY_STAFF", "THU_KHO", "THU KHO", "BEP_TRUONG", "BEP TRUONG", "DAU BEP" -> Role.ROLE_INVENTORY_STAFF;
             default -> Role.ROLE_WAITER;
         };
     }

@@ -32,13 +32,13 @@ public class KhachHang {
     @Column(name = "HoVaTen", length = 100, nullable = false)
     private String hoVaTen;
 
-    @Column(name = "SDT", length = 15, nullable = false)
+    @Column(name = "SDT", length = 20)
     private String sdt;
 
-    @Column(name = "GhiChu", length = 255)
+    @Column(name = "GhiChu", columnDefinition = "TEXT")
     private String ghiChu;
 
-    @OneToMany(mappedBy = "khachHang", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "danhSachKhachHang", fetch = FetchType.LAZY)
     @Builder.Default
     private Set<DatBan> danhSachDatBan = new HashSet<>();
 

@@ -25,11 +25,11 @@ public class NguyenLieuDTO {
     private String maNguyenLieu;
 
     @NotBlank(message = "Tên nguyên liệu không được để trống")
-    @Size(max = 100, message = "Tên nguyên liệu tối đa 100 ký tự")
+    @Size(max = 150, message = "Tên nguyên liệu tối đa 150 ký tự")
     private String tenNguyenLieu;
 
     @NotBlank(message = "Đơn vị tính không được để trống")
-    @Size(max = 30, message = "Đơn vị tính tối đa 30 ký tự")
+    @Size(max = 50, message = "Đơn vị tính tối đa 50 ký tự")
     private String donViTinh;
 
     @NotNull(message = "Lượng tồn không được để trống")

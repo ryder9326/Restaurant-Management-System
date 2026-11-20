@@ -27,15 +27,17 @@ public class ThucDonDTO {
     private String maMon;
 
     @NotBlank(message = "Tên món ăn không được để trống")
-    @Size(max = 100, message = "Tên món ăn tối đa 100 ký tự")
+    @Size(max = 150, message = "Tên món ăn tối đa 150 ký tự")
     private String tenMon;
 
-    @Size(max = 500, message = "Mô tả món ăn tối đa 500 ký tự")
     private String moTa;
 
     @NotNull(message = "Giá bán không được để trống")
     @DecimalMin(value = "0.0", inclusive = false, message = "Giá bán phải lớn hơn 0")
     private BigDecimal giaBan;
+
+    @Size(max = 50, message = "Trạng thái món tối đa 50 ký tự")
+    private String trangThaiMon;
 
     @Builder.Default
     private Set<String> maNguyenLieuList = new HashSet<>();

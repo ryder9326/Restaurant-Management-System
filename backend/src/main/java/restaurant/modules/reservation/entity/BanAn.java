@@ -26,14 +26,14 @@ public class BanAn {
     @Column(name = "MaBan", length = 20, nullable = false)
     private String maBan;
 
-    @Column(name = "KhuVuc", length = 50, nullable = false)
+    @Column(name = "KhuVuc", length = 50)
     private String khuVuc;
 
-    @Column(name = "SucChua", nullable = false)
+    @Column(name = "SucChua")
     private Integer sucChua;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "TrangThaiSuDung", length = 30, nullable = false)
+    @Convert(converter = restaurant.modules.reservation.converter.TrangThaiBanConverter.class)
+    @Column(name = "TrangThaiSuDung", length = 50)
     private TrangThaiBan trangThaiSuDung;
 
     @OneToMany(mappedBy = "banAn", fetch = FetchType.LAZY)

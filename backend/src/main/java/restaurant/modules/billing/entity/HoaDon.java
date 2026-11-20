@@ -2,9 +2,11 @@ package restaurant.modules.billing.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import restaurant.modules.reservation.entity.DatBan;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,8 +28,12 @@ public class HoaDon {
     @Column(name = "MaHD", length = 20, nullable = false)
     private String maHD;
 
-    @Column(name = "TongTien", precision = 15, scale = 2, nullable = false)
+    @Column(name = "TongTien", precision = 15, scale = 2)
     private BigDecimal tongTien;
+
+    @CreationTimestamp
+    @Column(name = "ThoiGianTao", updatable = false)
+    private LocalDateTime thoiGianTao;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

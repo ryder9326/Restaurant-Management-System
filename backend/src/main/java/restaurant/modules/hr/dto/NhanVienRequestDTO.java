@@ -19,6 +19,7 @@ import java.time.LocalDate;
 @Builder
 public class NhanVienRequestDTO {
 
+    @NotBlank(message = "Mã nhân viên không được để trống")
     @Size(max = 20, message = "Mã nhân viên tối đa 20 ký tự")
     private String maNV;
 
@@ -31,7 +32,7 @@ public class NhanVienRequestDTO {
     private Integer tuoi;
 
     @NotBlank(message = "Chức vụ không được để trống")
-    @Size(max = 50, message = "Chức vụ tối đa 50 ký tự")
+    @Size(max = 100, message = "Chức vụ tối đa 100 ký tự")
     private String chucVu;
 
     private LocalDate ngayBatDau;
