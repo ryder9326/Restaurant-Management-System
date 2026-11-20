@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Plus Jakarta Sans", "Be Vietnam Pro", system-ui, -apple-system, sans-serif;
+  --font-sans: "Be Vietnam Pro", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-terracotta-50: #fdf5f1;
+  --color-terracotta-100: #fbe7dd;
+  --color-terracotta-200: #f5ccb8;
+  --color-terracotta-500: #d16436;
+  --color-terracotta-600: #c2572b;
+  --color-terracotta-700: #a5451e;
+  --color-terracotta-800: #873717;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: #1f1d1a;
+    background-color: #f7f6f4;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #printable-revenue-report,
+  #printable-revenue-report *,
+  #printable-thermal-receipt,
+  #printable-thermal-receipt * {
+    visibility: visible;
+  }
+
+  #printable-revenue-report {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background: #ffffff;
+    color: #1f1d1a;
+  }
+
+  #printable-thermal-receipt {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80mm;
+    padding: 4mm;
+    margin: 0;
+    background: #ffffff;
+    color: #000000;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Bếp Việt — Hệ thống Quản lý Nhà hàng",
+  "description": "Khung giao diện Hệ thống Quản lý Nhà hàng tiếng Việt với phân quyền theo vai trò và kiến trúc dịch vụ sẵn sàng tích hợp Java REST API Backend.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
