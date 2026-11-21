@@ -15,7 +15,7 @@ public class BuoiLamViecConverter extends AbstractEnumStringConverter<BuoiLamVie
                 BuoiLamViec.CA_SANG, "Ca Sáng",
                 BuoiLamViec.CA_CHIEU, "Ca Chiều",
                 BuoiLamViec.CA_TOI, "Ca Tối",
-                BuoiLamViec.CA_GAY, "Cả Ngày"
+                BuoiLamViec.CA_NGAY, "Cả Ngày"
         ));
     }
 }

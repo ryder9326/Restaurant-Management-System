@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/hr/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers(HttpMethod.GET, "/inventory/**").authenticated()
                         .requestMatchers("/inventory/**").hasAnyRole("ADMIN", "MANAGER", "INVENTORY_STAFF")
+                        .requestMatchers(HttpMethod.GET, "/reservations/tables/**").authenticated()
                         .requestMatchers("/reservations/**").hasAnyRole("ADMIN", "MANAGER", "RECEPTIONIST", "WAITER")
                         .requestMatchers("/menu-orders/**").hasAnyRole("ADMIN", "MANAGER", "WAITER", "CASHIER")
                         .requestMatchers("/billing/**").hasAnyRole("ADMIN", "MANAGER", "CASHIER")

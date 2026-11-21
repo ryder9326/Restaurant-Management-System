@@ -1,18 +1,19 @@
 import { ApiResponse } from '../types';
 
-export const API_BASE_URL =
+const RAW_API_BASE_URL =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) ||
   'http://localhost:8080/api/v1';
+
+export const API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, '');
 
 export const ACCESS_TOKEN_KEY = 'bepviet_access_token_v1';
 export const REFRESH_TOKEN_KEY = 'bepviet_refresh_token_v1';
 export const SESSION_STORAGE_KEY = 'bepviet_auth_session_v1';
 
-// Khung JSON phản hồi thực tế từ Spring Boot Backend
 interface BackendApiResponse<T> {
   code: number;
   message: string;
-  data: T;
+  data?: T;
   timestamp: string;
 }
 
@@ -31,6 +32,8 @@ export interface ApiRequestOptions extends Omit<RequestInit, 'body'> {
   skipAuth?: boolean;
   _isRetry?: boolean;
 }
+
+let refreshPromise: Promise<string | null> | null = null;
 
 export function getAccessToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -70,38 +73,55 @@ function buildErrorMessage(errBody: BackendErrorResponse | null, status: number)
   return `Lỗi kết nối máy chủ (HTTP ${status}).`;
 }
 
-async function tryRefreshAccessToken(): Promise<string | null> {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return null;
-
+function safeParseJson(rawText: string): unknown {
+  if (!rawText) return null;
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({ refreshToken }),
-    });
-
-    if (!response.ok) {
-      clearAuthStorage();
-      return null;
-    }
-
-    const json = (await response.json()) as BackendApiResponse<{
-      accessToken: string;
-      refreshToken?: string;
-    }>;
-
-    if (json?.data?.accessToken) {
-      setAuthTokens(json.data.accessToken, json.data.refreshToken ?? refreshToken);
-      return json.data.accessToken;
-    }
-    return null;
+    return JSON.parse(rawText);
   } catch {
     return null;
   }
+}
+
+async function tryRefreshAccessToken(): Promise<string | null> {
+  if (refreshPromise) return refreshPromise;
+
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return null;
+
+  refreshPromise = (async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) {
+        clearAuthStorage();
+        return null;
+      }
+
+      const json = safeParseJson(await response.text()) as BackendApiResponse<{
+        accessToken: string;
+        refreshToken?: string;
+      }> | null;
+
+      if (json?.data?.accessToken) {
+        setAuthTokens(json.data.accessToken, json.data.refreshToken ?? refreshToken);
+        return json.data.accessToken;
+      }
+      return null;
+    } catch {
+      return null;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
 }
 
 /**
@@ -150,19 +170,19 @@ export async function apiRequest<T>(
   }
 
   const rawText = await response.text();
-  const parsed = rawText ? JSON.parse(rawText) : null;
+  const parsed = safeParseJson(rawText);
 
   if (!response.ok) {
     throw new Error(buildErrorMessage(parsed as BackendErrorResponse | null, response.status));
   }
 
-  // Chuẩn hóa ApiResponse của Java ({ code, message, data, timestamp }) sang kiểu của Frontend
-  if (parsed && typeof parsed === 'object' && 'data' in parsed && 'code' in parsed) {
+  // Chuẩn hóa ApiResponse của Java ({ code, message, data?, timestamp }) sang kiểu của Frontend
+  if (parsed && typeof parsed === 'object' && 'code' in parsed) {
     const beRes = parsed as BackendApiResponse<T>;
     return {
       success: beRes.code === 1000,
       message: beRes.message || 'Thành công',
-      data: beRes.data,
+      data: (beRes.data ?? null) as T,
       timestamp: beRes.timestamp || new Date().toISOString(),
     };
   }
@@ -170,7 +190,7 @@ export async function apiRequest<T>(
   return createApiResponse(parsed as T);
 }
 
-// --- Giữ lại các hàm hỗ trợ Mock Data cho các module chưa ghép ở Giai đoạn 3 ---
+// --- Giữ lại các hàm hỗ trợ Mock Data cho các module chưa ghép ---
 let mockNetworkDelayMs = 150;
 
 export function setMockNetworkDelay(ms: number): void {

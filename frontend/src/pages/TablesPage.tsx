@@ -30,6 +30,7 @@ const AREA_ORDER: TableArea[] = [
   TableArea.FLOOR_1,
   TableArea.FLOOR_2,
   TableArea.VIP_ROOM,
+  TableArea.OUTDOOR,
 ];
 
 const AREA_TABS: { value: AreaFilter; label: string }[] = [

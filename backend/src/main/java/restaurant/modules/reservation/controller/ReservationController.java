@@ -57,6 +57,11 @@ public class ReservationController {
                 .body(ApiResponse.success(created, "Thêm mới bàn ăn thành công"));
     }
 
+    @GetMapping("/tables")
+    public ResponseEntity<ApiResponse<List<BanAnDTO>>> getAllTables() {
+        return ResponseEntity.ok(ApiResponse.success(reservationService.getAllTables()));
+    }
+
     @GetMapping("/tables/available")
     public ResponseEntity<ApiResponse<List<BanAnDTO>>> getAvailableTables(
             @RequestParam(required = false) String khuVuc) {

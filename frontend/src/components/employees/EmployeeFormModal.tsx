@@ -28,8 +28,8 @@ interface EmployeeFormModalProps {
 const DEFAULT_SHIFTS = [
   'Ca hành chính (08:30 - 17:30)',
   'Ca sáng (09:00 - 16:00)',
-  'Ca chiều (15:00 - 22:30)',
-  'Ca gãy (09:00 - 14:00 & 17:00 - 21:30)',
+  'Ca tối (15:00 - 22:30)',
+  'Cả ngày (07:00 - 22:00)',
 ];
 
 function suggestNextEmployeeCode(employees: Employee[]): string {
@@ -38,7 +38,7 @@ function suggestNextEmployeeCode(employees: Employee[]): string {
     const num = match ? Number(match[1]) : 0;
     return Math.max(max, num);
   }, 0);
-  return `NV-${String(maxNum + 1).padStart(3, '0')}`;
+  return `NV${String(maxNum + 1).padStart(2, '0')}`;
 }
 
 function buildInitialState(
@@ -55,7 +55,7 @@ function buildInitialState(
       email: editingEmployee.email,
       shift: editingEmployee.shift,
       baseSalaryVnd: editingEmployee.baseSalaryVnd,
-      hireDate: editingEmployee.hireDate,
+      hireDate: new Date().toISOString().slice(0, 10),
       status: editingEmployee.status,
     };
   }
@@ -128,6 +128,8 @@ export function EmployeeFormModal({
   const inputBaseClass =
     'h-10 w-full rounded-lg border bg-[#FAF9F7] px-3 text-sm text-[#1F1D1A] placeholder:text-[#8A8378] transition-colors focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C2572B]/20';
 
+  const isEditMode = Boolean(editingEmployee);
+
   return (
     <Modal
       open={open}
@@ -194,14 +196,20 @@ export function EmployeeFormModal({
               id="emp-code"
               type="text"
               value={form.employeeCode}
+              disabled={isEditMode}
               onChange={(e) => updateField('employeeCode', e.target.value)}
-              placeholder="Ví dụ: NV-007"
-              className={`${inputBaseClass} font-mono ${
+              placeholder="Ví dụ: NV11"
+              className={`${inputBaseClass} font-mono disabled:cursor-not-allowed disabled:bg-[#EFECE6] disabled:text-[#6E675E] ${
                 errors.employeeCode
                   ? 'border-[#D92D20] focus:border-[#D92D20]'
                   : 'border-[#DCD7CE] focus:border-[#C2572B]'
               }`}
             />
+            {isEditMode && (
+              <p className="text-xs text-[#6E675E]">
+                Mã nhân viên là khóa định danh, không thể thay đổi sau khi tạo.
+              </p>
+            )}
             {errors.employeeCode && (
               <p className="text-xs text-[#B42318]">{errors.employeeCode}</p>
             )}
@@ -281,7 +289,7 @@ export function EmployeeFormModal({
               htmlFor="emp-phone"
               className="block text-sm font-medium text-[#1F1D1A]"
             >
-              Số điện thoại <span className="text-[#B91C1C]">*</span>
+              Số điện thoại
             </label>
             <input
               id="emp-phone"
@@ -305,7 +313,7 @@ export function EmployeeFormModal({
               htmlFor="emp-email"
               className="block text-sm font-medium text-[#1F1D1A]"
             >
-              Email <span className="text-[#B91C1C]">*</span>
+              Email 
             </label>
             <input
               id="emp-email"

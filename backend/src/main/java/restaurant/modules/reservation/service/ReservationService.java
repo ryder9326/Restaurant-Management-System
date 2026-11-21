@@ -22,6 +22,8 @@ public interface ReservationService {
 
     BanAnDTO createTable(BanAnDTO dto);
 
+    List<BanAnDTO> getAllTables();
+
     List<BanAnDTO> getAvailableTablesByArea(String khuVuc);
 
     BanAnDTO updateTableStatus(String maBan, TrangThaiBan status);

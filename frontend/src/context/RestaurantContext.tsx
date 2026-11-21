@@ -114,30 +114,34 @@ export function RestaurantProvider({
 
   const refreshAll = useCallback(async () => {
     setError(null);
-    try {
-      const [tablesRes, menuRes, ordersRes, invoicesRes, discountsRes] =
-        await Promise.all([
-          tableService.getTables(),
-          menuService.getMenuItems(),
-          orderService.getOrders(),
-          invoiceService.getInvoices(),
-          discountService.getDiscountCodes(),
-        ]);
+    const [tablesRes, menuRes, ordersRes, invoicesRes, discountsRes] =
+      await Promise.allSettled([
+        tableService.getTables(),
+        menuService.getMenuItems(),
+        orderService.getOrders(),
+        invoiceService.getInvoices(),
+        discountService.getDiscountCodes(),
+      ]);
 
-      setTables(tablesRes.data);
-      setMenuItems(menuRes.data);
-      setOrders(ordersRes.data);
-      setInvoices(invoicesRes.data);
-      setDiscountCodes(discountsRes.data);
-    } catch (err) {
+    if (tablesRes.status === 'fulfilled') setTables(tablesRes.value.data);
+    if (menuRes.status === 'fulfilled') setMenuItems(menuRes.value.data);
+    if (ordersRes.status === 'fulfilled') setOrders(ordersRes.value.data);
+    if (invoicesRes.status === 'fulfilled') setInvoices(invoicesRes.value.data);
+    if (discountsRes.status === 'fulfilled') setDiscountCodes(discountsRes.value.data);
+
+    const results = [tablesRes, menuRes, ordersRes, invoicesRes, discountsRes];
+    const allFailed = results.every((r) => r.status === 'rejected');
+
+    if (allFailed) {
+      const firstReason = (results[0] as PromiseRejectedResult).reason;
       setError(
-        err instanceof Error
-          ? err.message
+        firstReason instanceof Error
+          ? firstReason.message
           : 'Không thể đồng bộ dữ liệu vận hành nhà hàng.'
       );
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   }, []);
 
   const refreshMenu = useCallback(async () => {
@@ -150,8 +154,9 @@ export function RestaurantProvider({
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     void refreshAll();
-  }, [refreshAll]);
+  }, [refreshAll, currentUser.id, currentUser.role]);
 
   const updateTable = useCallback(
     async (tableId: number, payload: UpdateTableDetailsRequest) => {
@@ -167,12 +172,12 @@ export function RestaurantProvider({
   const submitOrder = useCallback(async (payload: CreateOrderRequest) => {
     const res = await orderService.createOrder(payload);
     // Đồng bộ lại cả danh sách đơn hàng và sơ đồ bàn sau khi tạo/cập nhật phiếu
-    const [tablesRes, ordersRes] = await Promise.all([
+    const [tablesRes, ordersRes] = await Promise.allSettled([
       tableService.getTables(),
       orderService.getOrders(),
     ]);
-    setTables(tablesRes.data);
-    setOrders(ordersRes.data);
+    if (tablesRes.status === 'fulfilled') setTables(tablesRes.value.data);
+    if (ordersRes.status === 'fulfilled') setOrders(ordersRes.value.data);
     return { order: res.data, message: res.message };
   }, []);
 
@@ -247,14 +252,14 @@ export function RestaurantProvider({
   const checkoutOrder = useCallback(async (payload: CheckoutInvoiceRequest) => {
     const res = await invoiceService.checkoutOrder(payload);
     // Đồng bộ lại bàn (tự động chuyển về AVAILABLE), đơn hàng (SERVED) và hóa đơn (PAID)
-    const [tablesRes, ordersRes, invoicesRes] = await Promise.all([
+    const [tablesRes, ordersRes, invoicesRes] = await Promise.allSettled([
       tableService.getTables(),
       orderService.getOrders(),
       invoiceService.getInvoices(),
     ]);
-    setTables(tablesRes.data);
-    setOrders(ordersRes.data);
-    setInvoices(invoicesRes.data);
+    if (tablesRes.status === 'fulfilled') setTables(tablesRes.value.data);
+    if (ordersRes.status === 'fulfilled') setOrders(ordersRes.value.data);
+    if (invoicesRes.status === 'fulfilled') setInvoices(invoicesRes.value.data);
     return { invoice: res.data, message: res.message };
   }, []);
 

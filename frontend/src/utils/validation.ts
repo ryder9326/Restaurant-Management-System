@@ -29,15 +29,11 @@ export function validateEmployeeForm(
   }
 
   const digits = normalizePhoneDigits(input.phone);
-  if (!digits) {
-    errors.phone = 'Vui lòng nhập số điện thoại.';
-  } else if (!VN_PHONE_REGEX.test(digits)) {
-    errors.phone = 'Số điện thoại không hợp lệ (gồm 10–11 chữ số, bắt đầu bằng 0).';
+  if (digits && !VN_PHONE_REGEX.test(digits)) {
+    errors.phone = 'Số điện thoại không hợp lệ.';
   }
 
-  if (!input.email.trim()) {
-    errors.email = 'Vui lòng nhập địa chỉ email.';
-  } else if (!EMAIL_REGEX.test(input.email.trim())) {
+  if (input.email.trim() &&!EMAIL_REGEX.test(input.email.trim())) {
     errors.email = 'Định dạng email không hợp lệ.';
   }
 

@@ -20,6 +20,7 @@ import restaurant.modules.reservation.repository.BanAnRepository;
 import restaurant.modules.reservation.repository.DatBanRepository;
 import restaurant.modules.reservation.repository.KhachHangRepository;
 import restaurant.modules.reservation.service.ReservationService;
+import org.springframework.data.domain.Sort;
 
 import java.util.HashSet;
 import java.util.List;
@@ -82,6 +83,15 @@ public class ReservationServiceImpl implements ReservationService {
         }
         BanAn saved = banAnRepository.save(reservationMapper.toEntity(dto));
         return reservationMapper.toDTO(saved);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BanAnDTO> getAllTables() {
+        return banAnRepository.findAll(Sort.by("maBan").ascending())
+                .stream()
+                .map(reservationMapper::toDTO)
+                .toList();
     }
 
     @Override

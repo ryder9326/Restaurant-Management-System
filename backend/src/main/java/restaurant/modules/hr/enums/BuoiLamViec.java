@@ -9,5 +9,5 @@ public enum BuoiLamViec {
     CA_SANG,
     CA_CHIEU,
     CA_TOI,
-    CA_GAY
+    CA_NGAY
 }
