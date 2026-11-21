@@ -20,6 +20,7 @@ public class DatMonResponseDTO {
 
     private String maKH;
     private String tenKhachHang;
+    private String maBan;
     private String maMon;
     private String tenMon;
     private LocalDateTime thoiGianGoi;

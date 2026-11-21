@@ -61,6 +61,11 @@ public class MenuOrderController {
         return ResponseEntity.ok(ApiResponse.success(menuOrderService.searchMenuItemsByName(keyword)));
     }
 
+    @GetMapping("/orders")
+    public ResponseEntity<ApiResponse<List<DatMonResponseDTO>>> getAllDishOrders() {
+        return ResponseEntity.ok(ApiResponse.success(menuOrderService.getAllDishOrders()));
+    }
+
     @PostMapping("/orders")
     public ResponseEntity<ApiResponse<DatMonResponseDTO>> placeDishOrder(
             @Valid @RequestBody DatMonRequestDTO dto) {

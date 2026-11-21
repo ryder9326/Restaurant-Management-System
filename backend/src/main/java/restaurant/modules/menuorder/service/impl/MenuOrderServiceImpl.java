@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Comparator;
 
 /**
  * Lớp triển khai toàn bộ nghiệp vụ của phân hệ Thực đơn & Gọi món.
@@ -76,6 +77,9 @@ public class MenuOrderServiceImpl implements MenuOrderService {
         existing.setTenMon(dto.getTenMon());
         existing.setMoTa(dto.getMoTa());
         existing.setGiaBan(dto.getGiaBan());
+        if (dto.getTrangThaiMon() != null && !dto.getTrangThaiMon().isBlank()) {
+            existing.setTrangThaiMon(dto.getTrangThaiMon());
+        }
         if (dto.getMaNguyenLieuList() != null) {
             existing.setDanhSachNguyenLieu(resolveIngredients(dto.getMaNguyenLieuList()));
         }
@@ -201,6 +205,15 @@ public class MenuOrderServiceImpl implements MenuOrderService {
     @Transactional(readOnly = true)
     public List<CustomerDishOrderProjection> getCustomerOrdersByPhoneAndDate(String sdt, LocalDate date) {
         return datMonRepository.findCustomerOrdersByPhoneAndDate(sdt, date);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<DatMonResponseDTO> getAllDishOrders() {
+        return datMonRepository.findAll().stream()
+                .sorted(Comparator.comparing((DatMon dm) -> dm.getId().getThoiGianGoi()).reversed())
+                .map(menuOrderMapper::toDatMonResponseDTO)
+                .toList();
     }
 
     private Set<NguyenLieu> resolveIngredients(Set<String> ingredientIds) {

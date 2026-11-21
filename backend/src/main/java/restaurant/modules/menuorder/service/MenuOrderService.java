@@ -33,6 +33,8 @@ public interface MenuOrderService {
             TrangThaiDatMon newStatus
     );
 
+    List<DatMonResponseDTO> getAllDishOrders();
+
     List<DishStatusStatProjection> getDishStatusStatsByDate(LocalDate date);
 
     List<CustomerDishOrderProjection> getCustomerOrdersByPhoneAndDate(String sdt, LocalDate date);

@@ -50,9 +50,17 @@ public class MenuOrderMapper {
         BigDecimal unitPrice = entity.getThucDon().getGiaBan();
         BigDecimal lineTotal = unitPrice.multiply(BigDecimal.valueOf(entity.getSoLuong()));
 
+        String maBan = null;
+        if (entity.getKhachHang() != null
+                && entity.getKhachHang().getBanDangNgoi() != null
+                && !entity.getKhachHang().getBanDangNgoi().isEmpty()) {
+            maBan = entity.getKhachHang().getBanDangNgoi().iterator().next().getMaBan();
+        }
+
         return DatMonResponseDTO.builder()
                 .maKH(entity.getId().getMaKH())
                 .tenKhachHang(entity.getKhachHang().getHoVaTen())
+                .maBan(maBan)
                 .maMon(entity.getId().getMaMon())
                 .tenMon(entity.getThucDon().getTenMon())
                 .thoiGianGoi(entity.getId().getThoiGianGoi())

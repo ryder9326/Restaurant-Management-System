@@ -30,6 +30,7 @@ interface MenuItemFormModalProps {
 const PRIMARY_MENU_CATEGORIES: MenuCategory[] = [
   MenuCategory.APPETIZER,
   MenuCategory.MAIN_COURSE,
+  MenuCategory.SOUP_HOTPOT,
   MenuCategory.DRINK,
   MenuCategory.DESSERT,
 ];
@@ -39,22 +40,12 @@ const SELECTABLE_STATUSES: MenuItemStatus[] = [
   MenuItemStatus.OUT_OF_STOCK,
 ];
 
-function suggestNextSku(items: MenuItem[], category: MenuCategory): string {
-  const prefixMap: Record<MenuCategory, string> = {
-    [MenuCategory.APPETIZER]: 'KV',
-    [MenuCategory.MAIN_COURSE]: 'MC',
-    [MenuCategory.SOUP_HOTPOT]: 'MC',
-    [MenuCategory.DRINK]: 'DU',
-    [MenuCategory.DESSERT]: 'TM',
-  };
-  const prefix = prefixMap[category];
-  const maxNum = items
-    .filter((item) => item.sku.startsWith(`${prefix}-`))
-    .reduce((max, item) => {
-      const match = item.sku.match(/(\d+)$/);
-      return Math.max(max, match ? Number(match[1]) : 0);
-    }, 0);
-  return `${prefix}-${String(maxNum + 1).padStart(2, '0')}`;
+function suggestNextSku(items: MenuItem[]): string {
+  const maxNum = items.reduce((max, item) => {
+    const match = item.sku.match(/(\d+)$/);
+    return Math.max(max, match ? Number(match[1]) : 0);
+  }, 0);
+  return `MON${String(maxNum + 1).padStart(2, '0')}`;
 }
 
 function buildInitialState(
@@ -76,7 +67,7 @@ function buildInitialState(
   }
 
   return {
-    sku: suggestNextSku(existingItems, MenuCategory.MAIN_COURSE),
+    sku: suggestNextSku(existingItems),
     name: '',
     description: '',
     category: MenuCategory.MAIN_COURSE,
@@ -141,6 +132,8 @@ export function MenuItemFormModal({
 
   const inputBaseClass =
     'h-10 w-full rounded-lg border bg-[#FAF9F7] px-3 text-sm text-[#1F1D1A] placeholder:text-[#8A8378] transition-colors focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C2572B]/20';
+
+  const isEditMode = Boolean(editingItem);
 
   return (
     <Modal
@@ -208,14 +201,20 @@ export function MenuItemFormModal({
               id="dish-sku"
               type="text"
               value={form.sku}
+              disabled={isEditMode}
               onChange={(e) => updateField('sku', e.target.value)}
-              placeholder="Ví dụ: MC-07"
-              className={`${inputBaseClass} font-mono ${
+              placeholder="Ví dụ: MON11"
+              className={`${inputBaseClass} font-mono disabled:cursor-not-allowed disabled:bg-[#EFECE6] disabled:text-[#6E675E] ${
                 errors.sku
                   ? 'border-[#D92D20] focus:border-[#D92D20]'
                   : 'border-[#DCD7CE] focus:border-[#C2572B]'
               }`}
             />
+            {isEditMode && (
+              <p className="text-xs text-[#6E675E]">
+                Mã món là khóa định danh, không thể thay đổi sau khi tạo.
+              </p>
+            )}
             {errors.sku && (
               <p className="text-xs text-[#B42318]">{errors.sku}</p>
             )}
@@ -255,13 +254,9 @@ export function MenuItemFormModal({
             <select
               id="dish-category"
               value={form.category}
-              onChange={(e) => {
-                const nextCategory = e.target.value as MenuCategory;
-                updateField('category', nextCategory);
-                if (!editingItem) {
-                  updateField('sku', suggestNextSku(existingItems, nextCategory));
-                }
-              }}
+              onChange={(e) =>
+                updateField('category', e.target.value as MenuCategory)
+              }
               className={`${inputBaseClass} border-[#DCD7CE] focus:border-[#C2572B]`}
             >
               {PRIMARY_MENU_CATEGORIES.map((category) => (
