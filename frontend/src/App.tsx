@@ -15,9 +15,9 @@ import {
 import { authService } from './services';
 import { LoginResponse, PageKey, User } from './types';
 import {
-  canAccessPage,
+  canUserAccessPage,
   getDefaultPageForRole,
-  getMenuItemsForRole,
+  getMenuItemsForUser,
   getNavItemByKey,
 } from './utils';
 
@@ -48,7 +48,7 @@ export default function App() {
   }, []);
 
   const roleMenuItems = useMemo(
-    () => (user ? getMenuItemsForRole(user.role) : []),
+    () => (user ? getMenuItemsForUser(user) : []),
     [user]
   );
 
@@ -64,7 +64,7 @@ export default function App() {
 
   function handleSelectPage(nextPage: PageKey) {
     if (!user) return;
-    if (canAccessPage(user.role, nextPage)) {
+    if (canUserAccessPage(user, nextPage)) {
       setActivePage(nextPage);
     }
   }
@@ -81,7 +81,7 @@ export default function App() {
     return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
   }
 
-  const safeActivePage = canAccessPage(user.role, activePage)
+  const safeActivePage = canUserAccessPage(user, activePage)
     ? activePage
     : getDefaultPageForRole(user.role);
 

@@ -23,6 +23,7 @@ export interface User {
   email: string;
   phone: string;
   role: UserRole;
+  backendRole?: string;
   avatarUrl?: string;
   active: boolean;
   lastLoginAt?: string;

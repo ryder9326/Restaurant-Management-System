@@ -19,12 +19,13 @@ import {
   TableStatus,
 } from '../types';
 import {
+  canAccessBilling,
   formatDateTimeVi,
   formatVnd,
   TABLE_AREA_LABELS,
 } from '../utils';
 
-type AreaFilter = 'ALL' | TableArea.FLOOR_1 | TableArea.FLOOR_2 | TableArea.VIP_ROOM;
+type AreaFilter = 'ALL' | TableArea.FLOOR_1 | TableArea.FLOOR_2 | TableArea.VIP_ROOM | TableArea.OUTDOOR;
 
 const AREA_ORDER: TableArea[] = [
   TableArea.FLOOR_1,
@@ -38,6 +39,7 @@ const AREA_TABS: { value: AreaFilter; label: string }[] = [
   { value: TableArea.FLOOR_1, label: TABLE_AREA_LABELS[TableArea.FLOOR_1] },
   { value: TableArea.FLOOR_2, label: TABLE_AREA_LABELS[TableArea.FLOOR_2] },
   { value: TableArea.VIP_ROOM, label: TABLE_AREA_LABELS[TableArea.VIP_ROOM] },
+  { value: TableArea.OUTDOOR, label: TABLE_AREA_LABELS[TableArea.OUTDOOR] },
 ];
 
 const STATUS_SHORT_LABEL: Record<TableStatus, string> = {
@@ -89,6 +91,7 @@ const TABLE_CARD_THEME: Record<
 
 export function TablesPage() {
   const {
+    currentUser,
     tables,
     orders,
     loading,
@@ -98,6 +101,8 @@ export function TablesPage() {
     goToPosForTable,
     goToBillingForTable,
   } = useRestaurant();
+
+  const allowBilling = canAccessBilling(currentUser);
 
   const [areaFilter, setAreaFilter] = useState<AreaFilter>('ALL');
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
@@ -734,14 +739,16 @@ export function TablesPage() {
                       </button>
 
                       {selectedTableActiveOrder ? (
-                        <button
-                          type="button"
-                          onClick={() => goToBillingForTable(selectedTable.id)}
-                          className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#DCD7CE] bg-white px-4 text-sm font-semibold text-[#1F1D1A] transition-colors hover:border-[#C2572B]/50 hover:bg-[#FDF5F1] hover:text-[#9A3D18] cursor-pointer"
-                        >
-                          <ReceiptText className="h-4 w-4" aria-hidden="true" />
-                          <span>Đi tới thanh toán hóa đơn</span>
-                        </button>
+                        allowBilling && (
+                          <button
+                            type="button"
+                            onClick={() => goToBillingForTable(selectedTable.id)}
+                            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#DCD7CE] bg-white px-4 text-sm font-semibold text-[#1F1D1A] transition-colors hover:border-[#C2572B]/50 hover:bg-[#FDF5F1] hover:text-[#9A3D18] cursor-pointer"
+                          >
+                            <ReceiptText className="h-4 w-4" aria-hidden="true" />
+                            <span>Đi tới thanh toán hóa đơn</span>
+                          </button>
+                        )
                       ) : (
                         <button
                           type="button"

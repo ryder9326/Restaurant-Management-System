@@ -20,6 +20,7 @@ import {
   TableStatus,
 } from '../types';
 import {
+  canAccessBilling,
   formatVnd,
   MENU_CATEGORY_LABELS,
   TABLE_AREA_LABELS,
@@ -77,6 +78,8 @@ export function OrdersPage() {
     goToBillingForTable,
     navigateTo,
   } = useRestaurant();
+
+  const allowBilling = canAccessBilling(currentUser);
 
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -322,7 +325,7 @@ export function OrdersPage() {
             <span>{feedback.message}</span>
           </div>
           <div className="flex items-center gap-3">
-            {feedback.type === 'success' && feedback.tableId && (
+            {allowBilling && feedback.type === 'success' && feedback.tableId && (
               <button
                 type="button"
                 onClick={() => goToBillingForTable(feedback.tableId!)}

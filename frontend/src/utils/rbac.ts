@@ -1,4 +1,5 @@
-import { NavItemConfig, PageKey, UserRole } from '../types';
+import { NavItemConfig, PageKey, User, UserRole } from '../types';
+import { canAccessBilling } from './permissions';
 
 export const NAVIGATION_ITEMS: NavItemConfig[] = [
   {
@@ -59,6 +60,8 @@ export const NAVIGATION_ITEMS: NavItemConfig[] = [
   },
 ];
 
+const BILLING_PAGES: ReadonlySet<PageKey> = new Set(['invoices', 'discounts']);
+
 export function getMenuItemsForRole(role: UserRole): NavItemConfig[] {
   return NAVIGATION_ITEMS.filter((item) => item.allowedRoles.includes(role));
 }
@@ -66,6 +69,17 @@ export function getMenuItemsForRole(role: UserRole): NavItemConfig[] {
 export function canAccessPage(role: UserRole, pageKey: PageKey): boolean {
   const item = NAVIGATION_ITEMS.find((entry) => entry.key === pageKey);
   return Boolean(item && item.allowedRoles.includes(role));
+}
+
+export function canUserAccessPage(user: User, pageKey: PageKey): boolean {
+  if (BILLING_PAGES.has(pageKey)) {
+    return canAccessBilling(user);
+  }
+  return canAccessPage(user.role, pageKey);
+}
+
+export function getMenuItemsForUser(user: User): NavItemConfig[] {
+  return NAVIGATION_ITEMS.filter((item) => canUserAccessPage(user, item.key));
 }
 
 export function getDefaultPageForRole(role: UserRole): PageKey {

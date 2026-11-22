@@ -94,6 +94,7 @@ function mapAuthDataToUser(data: {
     email: `${data.username}@bepviet.vn`,
     phone: '',
     role: feRole,
+    backendRole: data.role,
     avatarUrl: demoMatch?.avatarUrl,
     active: data.trangThaiLamViec ? data.trangThaiLamViec !== 'NGHI_VIEC' : true,
     lastLoginAt: new Date().toISOString(),

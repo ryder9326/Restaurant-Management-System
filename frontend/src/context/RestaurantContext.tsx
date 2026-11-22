@@ -29,7 +29,7 @@ import {
   UpdateTableDetailsRequest,
   User,
 } from '../types';
-import { DiscountValidationResult } from '../utils';
+import { canAccessBilling, DiscountValidationResult } from '../utils';
 
 interface RestaurantContextValue {
   currentUser: User;
@@ -112,28 +112,47 @@ export function RestaurantProvider({
     number | null
   >(null);
 
+  const allowBilling = canAccessBilling(currentUser);
+
   const refreshAll = useCallback(async () => {
     setError(null);
+
+    const emptyRes = <T,>(data: T) =>
+      Promise.resolve({
+        success: true,
+        message: '',
+        data,
+        timestamp: new Date().toISOString(),
+      });
+
     const [tablesRes, menuRes, ordersRes, invoicesRes, discountsRes] =
       await Promise.allSettled([
         tableService.getTables(),
         menuService.getMenuItems(),
         orderService.getOrders(),
-        invoiceService.getInvoices(),
-        discountService.getDiscountCodes(),
+        allowBilling ? invoiceService.getInvoices() : emptyRes<Invoice[]>([]),
+        allowBilling
+          ? discountService.getDiscountCodes()
+          : emptyRes<DiscountCode[]>([]),
       ]);
 
     if (tablesRes.status === 'fulfilled') setTables(tablesRes.value.data);
     if (menuRes.status === 'fulfilled') setMenuItems(menuRes.value.data);
     if (ordersRes.status === 'fulfilled') setOrders(ordersRes.value.data);
-    if (invoicesRes.status === 'fulfilled') setInvoices(invoicesRes.value.data);
-    if (discountsRes.status === 'fulfilled') setDiscountCodes(discountsRes.value.data);
 
-    const results = [tablesRes, menuRes, ordersRes, invoicesRes, discountsRes];
-    const allFailed = results.every((r) => r.status === 'rejected');
+    if (allowBilling) {
+      if (invoicesRes.status === 'fulfilled') setInvoices(invoicesRes.value.data);
+      if (discountsRes.status === 'fulfilled') {
+        setDiscountCodes(discountsRes.value.data);
+      }
+    } else {
+      setInvoices([]);
+      setDiscountCodes([]);
+    }
 
-    if (allFailed) {
-      const firstReason = (results[0] as PromiseRejectedResult).reason;
+    const coreResults = [tablesRes, menuRes, ordersRes];
+    if (coreResults.every((r) => r.status === 'rejected')) {
+      const firstReason = (coreResults[0] as PromiseRejectedResult).reason;
       setError(
         firstReason instanceof Error
           ? firstReason.message
@@ -142,7 +161,7 @@ export function RestaurantProvider({
     }
 
     setLoading(false);
-  }, []);
+  }, [allowBilling]);
 
   const refreshMenu = useCallback(async () => {
     try {
@@ -156,7 +175,7 @@ export function RestaurantProvider({
   useEffect(() => {
     setLoading(true);
     void refreshAll();
-  }, [refreshAll, currentUser.id, currentUser.role]);
+  }, [refreshAll, currentUser.id, currentUser.role, currentUser.backendRole]);
 
   const updateTable = useCallback(
     async (tableId: number, payload: UpdateTableDetailsRequest) => {
@@ -249,19 +268,25 @@ export function RestaurantProvider({
     []
   );
 
-  const checkoutOrder = useCallback(async (payload: CheckoutInvoiceRequest) => {
-    const res = await invoiceService.checkoutOrder(payload);
-    // Đồng bộ lại bàn (tự động chuyển về AVAILABLE), đơn hàng (SERVED) và hóa đơn (PAID)
-    const [tablesRes, ordersRes, invoicesRes] = await Promise.allSettled([
-      tableService.getTables(),
-      orderService.getOrders(),
-      invoiceService.getInvoices(),
-    ]);
-    if (tablesRes.status === 'fulfilled') setTables(tablesRes.value.data);
-    if (ordersRes.status === 'fulfilled') setOrders(ordersRes.value.data);
-    if (invoicesRes.status === 'fulfilled') setInvoices(invoicesRes.value.data);
-    return { invoice: res.data, message: res.message };
-  }, []);
+  const checkoutOrder = useCallback(
+    async (payload: CheckoutInvoiceRequest) => {
+      if (!allowBilling) {
+        throw new Error('Tài khoản của bạn không có quyền thanh toán hóa đơn.');
+      }
+      const res = await invoiceService.checkoutOrder(payload);
+      // Đồng bộ lại bàn (tự động chuyển về AVAILABLE), đơn hàng (SERVED) và hóa đơn (PAID)
+      const [tablesRes, ordersRes, invoicesRes] = await Promise.allSettled([
+        tableService.getTables(),
+        orderService.getOrders(),
+        invoiceService.getInvoices(),
+      ]);
+      if (tablesRes.status === 'fulfilled') setTables(tablesRes.value.data);
+      if (ordersRes.status === 'fulfilled') setOrders(ordersRes.value.data);
+      if (invoicesRes.status === 'fulfilled') setInvoices(invoicesRes.value.data);
+      return { invoice: res.data, message: res.message };
+    },
+    [allowBilling]
+  );
 
   const goToPosForTable = useCallback(
     (tableId: number) => {
@@ -273,10 +298,11 @@ export function RestaurantProvider({
 
   const goToBillingForTable = useCallback(
     (tableId: number) => {
+      if (!allowBilling) return;
       setSelectedBillingTableId(tableId);
       onNavigate('invoices');
     },
-    [onNavigate]
+    [allowBilling, onNavigate]
   );
 
   return (
