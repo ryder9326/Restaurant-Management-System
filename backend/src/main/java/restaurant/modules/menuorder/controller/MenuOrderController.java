@@ -97,4 +97,10 @@ public class MenuOrderController {
         return ResponseEntity.ok(ApiResponse.success(
                 menuOrderService.getCustomerOrdersByPhoneAndDate(sdt, date)));
     }
+
+    @DeleteMapping("/menu/{maMon}")
+    public ResponseEntity<ApiResponse<Void>> deleteMenuItemPermanently(@PathVariable String maMon) {
+        menuOrderService.deleteMenuItemPermanently(maMon);
+        return ResponseEntity.ok(ApiResponse.success(null, "Đã xóa vĩnh viễn món ăn khỏi hệ thống"));
+    }
 }

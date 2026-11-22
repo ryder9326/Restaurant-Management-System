@@ -70,6 +70,7 @@ export function EmployeesPage() {
   const filteredEmployees = useMemo(() => {
     const normalizedSearch = searchQuery.trim().toLowerCase();
     return employees.filter((emp) => {
+      if (emp.status === EmployeeStatus.INACTIVE) return false;
       if (roleFilter !== 'ALL' && emp.role !== roleFilter) {
         return false;
       }

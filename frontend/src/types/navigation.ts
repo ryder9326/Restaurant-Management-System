@@ -8,7 +8,8 @@ export type PageKey =
   | 'menu'
   | 'invoices'
   | 'discounts'
-  | 'employees';
+  | 'employees'
+  | 'trash';
 
 export interface NavItemConfig {
   key: PageKey;

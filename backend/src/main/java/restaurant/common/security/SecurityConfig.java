@@ -50,6 +50,8 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/menu-orders/menu/**").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers(HttpMethod.DELETE, "/hr/employees/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/hr/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers(HttpMethod.GET, "/inventory/**").authenticated()
                         .requestMatchers("/inventory/**").hasAnyRole("ADMIN", "MANAGER", "INVENTORY_STAFF")

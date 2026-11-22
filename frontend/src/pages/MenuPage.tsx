@@ -76,6 +76,7 @@ export function MenuPage() {
   const filteredItems = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     return items.filter((item) => {
+      if (item.status === MenuItemStatus.DISCONTINUED) return false;
       if (categoryFilter !== 'ALL' && item.category !== categoryFilter) {
         return false;
       }

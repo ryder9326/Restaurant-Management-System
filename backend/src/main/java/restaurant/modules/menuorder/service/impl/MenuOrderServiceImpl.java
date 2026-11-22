@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 import restaurant.common.exception.BusinessConflictException;
 import restaurant.common.exception.ErrorCode;
 import restaurant.common.exception.ResourceNotFoundException;
@@ -62,6 +63,31 @@ public class MenuOrderServiceImpl implements MenuOrderService {
         Set<NguyenLieu> ingredients = resolveIngredients(dto.getMaNguyenLieuList());
         ThucDon saved = thucDonRepository.save(menuOrderMapper.toEntity(dto, ingredients));
         return menuOrderMapper.toDTO(saved);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMenuItemPermanently(String maMon) {
+        ThucDon existing = thucDonRepository.findById(maMon)
+                .orElseThrow(() -> new ResourceNotFoundException("ThucDon", "maMon", maMon));
+
+        if (!"Ngừng bán".equalsIgnoreCase(existing.getTrangThaiMon())) {
+            throw new BusinessConflictException(
+                    "Chỉ có thể xóa vĩnh viễn món ăn đang nằm trong Thùng rác (Ngừng bán)."
+            );
+        }
+
+        try {
+            existing.getDanhSachNguyenLieu().clear();
+            thucDonRepository.saveAndFlush(existing);
+            thucDonRepository.delete(existing);
+            thucDonRepository.flush();
+        } catch (DataIntegrityViolationException ex) {
+            throw new BusinessConflictException(
+                    "Không thể xóa vĩnh viễn món '" + existing.getTenMon()
+                            + "' vì đã có trong lịch sử gọi món hoặc hóa đơn."
+            );
+        }
     }
 
     /**

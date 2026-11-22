@@ -6,3 +6,4 @@ export { MenuPage } from './MenuPage';
 export { InvoicesPage } from './InvoicesPage';
 export { DiscountsPage } from './DiscountsPage';
 export { EmployeesPage } from './EmployeesPage';
+export { TrashPage } from './TrashPage';

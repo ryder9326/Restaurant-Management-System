@@ -9,6 +9,7 @@ import {
   Users,
   UtensilsCrossed,
   X,
+  Trash2,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { NavItemConfig, PageKey, User } from '../../types';
@@ -34,6 +35,7 @@ const NAV_ICONS: Record<PageKey, ComponentType<{ className?: string }>> = {
   invoices: Receipt,
   discounts: TicketPercent,
   employees: Users,
+  trash: Trash2,
 };
 
 export function Sidebar({

@@ -11,6 +11,7 @@ import {
   MenuPage,
   OrdersPage,
   TablesPage,
+  TrashPage,
 } from './pages';
 import { authService } from './services';
 import { LoginResponse, PageKey, User } from './types';
@@ -105,6 +106,8 @@ export default function App() {
         return <DiscountsPage />;
       case 'employees':
         return <EmployeesPage />;
+      case 'trash':
+        return <TrashPage />;
     }
   }
 

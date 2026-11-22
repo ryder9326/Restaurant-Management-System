@@ -344,3 +344,42 @@ export async function deleteMenuItem(id: number): Promise<ApiResponse<null>> {
     message: 'Đã chuyển món ăn sang trạng thái Ngừng bán',
   };
 }
+
+/**
+ * Khôi phục món ăn từ Thùng rác về trạng thái Đang bán (AVAILABLE).
+ */
+export async function restoreMenuItem(id: number): Promise<ApiResponse<MenuItem>> {
+  const res = await updateMenuItemStatus(id, MenuItemStatus.AVAILABLE);
+  return {
+    ...res,
+    message: 'Đã khôi phục món ăn trở lại thực đơn',
+  };
+}
+
+/**
+ * DELETE /api/v1/menu-orders/menu/{maMon} — Xóa vĩnh viễn khỏi MySQL.
+ */
+export async function permanentlyDeleteMenuItem(id: number): Promise<ApiResponse<null>> {
+  const targetMaMon = idToMaMonMap.get(id);
+  if (!targetMaMon) {
+    throw new Error(`Không tìm thấy món ăn mã #${id}.`);
+  }
+
+  const res = await apiRequest<void>(
+    `/menu-orders/menu/${encodeURIComponent(targetMaMon)}`,
+    { method: 'DELETE' }
+  );
+
+  beMenuCacheByMaMon.delete(targetMaMon);
+  if (typeof window !== 'undefined') {
+    const meta = readMenuUiMetaMap();
+    delete meta[targetMaMon];
+    window.localStorage.setItem(MENU_UI_META_KEY, JSON.stringify(meta));
+  }
+
+  return {
+    ...res,
+    data: null,
+    message: res.message || 'Đã xóa vĩnh viễn món ăn khỏi hệ thống',
+  };
+}

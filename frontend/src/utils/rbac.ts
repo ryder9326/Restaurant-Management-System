@@ -58,6 +58,13 @@ export const NAVIGATION_ITEMS: NavItemConfig[] = [
     section: 'Quản trị',
     allowedRoles: [UserRole.MANAGER],
   },
+  {
+    key: 'trash',
+    label: 'Thùng rác',
+    shortDescription: 'Quản lý món ăn ngừng bán và nhân viên đã nghỉ việc để khôi phục hoặc xóa vĩnh viễn.',
+    section: 'Quản trị',
+    allowedRoles: [UserRole.MANAGER],
+  },
 ];
 
 const BILLING_PAGES: ReadonlySet<PageKey> = new Set(['invoices', 'discounts']);

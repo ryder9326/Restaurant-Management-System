@@ -328,3 +328,65 @@ export async function deleteEmployee(id: number): Promise<ApiResponse<null>> {
     message: 'Đã chuyển trạng thái nhân viên sang Đã nghỉ việc',
   };
 }
+
+/**
+ * Chuyển nhân viên vào Thùng rác (xóa mềm: trạng thái INACTIVE / NGHI_VIEC).
+ */
+export async function archiveEmployee(employee: Employee): Promise<ApiResponse<Employee>> {
+  const res = await updateEmployee(employee.id, {
+    employeeCode: employee.employeeCode,
+    fullName: employee.fullName,
+    role: employee.role,
+    positionTitle: employee.positionTitle,
+    phone: employee.phone,
+    email: employee.email,
+    shift: employee.shift,
+    baseSalaryVnd: employee.baseSalaryVnd,
+    hireDate: employee.hireDate,
+    status: EmployeeStatus.INACTIVE,
+  });
+  return {
+    ...res,
+    message: `Đã chuyển nhân viên ${employee.fullName} vào Thùng rác`,
+  };
+}
+
+/**
+ * Khôi phục nhân viên từ Thùng rác về trạng thái Đang làm việc (ACTIVE).
+ */
+export async function restoreEmployee(employee: Employee): Promise<ApiResponse<Employee>> {
+  const res = await updateEmployee(employee.id, {
+    employeeCode: employee.employeeCode,
+    fullName: employee.fullName,
+    role: employee.role,
+    positionTitle: employee.positionTitle,
+    phone: employee.phone,
+    email: employee.email,
+    shift: employee.shift,
+    baseSalaryVnd: employee.baseSalaryVnd,
+    hireDate: employee.hireDate,
+    status: EmployeeStatus.ACTIVE,
+  });
+  return {
+    ...res,
+    message: `Đã khôi phục nhân viên ${employee.fullName}`,
+  };
+}
+
+/**
+ * DELETE /api/v1/hr/employees/{maNV} — Xóa vĩnh viễn khỏi MySQL.
+ */
+export async function permanentlyDeleteEmployee(
+  maNV: string
+): Promise<ApiResponse<null>> {
+  const res = await apiRequest<void>(
+    `/hr/employees/${encodeURIComponent(maNV)}`,
+    { method: 'DELETE' }
+  );
+
+  return {
+    ...res,
+    data: null,
+    message: res.message || 'Đã xóa vĩnh viễn hồ sơ nhân viên',
+  };
+}

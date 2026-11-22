@@ -103,4 +103,13 @@ public class NhanVienController {
     public ResponseEntity<ApiResponse<List<ActiveTableServiceProjection>>> getActiveServingStaff() {
         return ResponseEntity.ok(ApiResponse.success(nhanVienService.getActiveServingStaffAndCustomers()));
     }
+
+    @DeleteMapping("/employees/{maNV}")
+    public ResponseEntity<ApiResponse<Void>> deleteEmployeePermanently(
+            @PathVariable String maNV,
+            org.springframework.security.core.Authentication authentication) {
+        String currentUsername = authentication != null ? authentication.getName() : "";
+        nhanVienService.deleteEmployeePermanently(maNV, currentUsername);
+        return ResponseEntity.ok(ApiResponse.success(null, "Đã xóa vĩnh viễn hồ sơ nhân viên"));
+    }
 }

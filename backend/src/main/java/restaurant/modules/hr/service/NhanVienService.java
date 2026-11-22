@@ -36,4 +36,6 @@ public interface NhanVienService {
     void recordCustomerReception(String maNV, String maKH);
 
     List<ActiveTableServiceProjection> getActiveServingStaffAndCustomers();
+
+    void deleteEmployeePermanently(String maNV, String currentUsername);
 }

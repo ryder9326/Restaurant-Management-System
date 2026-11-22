@@ -38,4 +38,6 @@ public interface MenuOrderService {
     List<DishStatusStatProjection> getDishStatusStatsByDate(LocalDate date);
 
     List<CustomerDishOrderProjection> getCustomerOrdersByPhoneAndDate(String sdt, LocalDate date);
+
+    void deleteMenuItemPermanently(String maMon);
 }

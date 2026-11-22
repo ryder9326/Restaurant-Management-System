@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import restaurant.common.exception.AppException;
 import restaurant.common.exception.BusinessConflictException;
 import restaurant.common.exception.ErrorCode;
@@ -82,6 +83,33 @@ public class NhanVienServiceImpl implements NhanVienService {
         }
 
         return nhanVienMapper.toResponseDTO(savedNhanVien);
+    }
+
+    @Override
+    @Transactional
+    public void deleteEmployeePermanently(String maNV, String currentUsername) {
+        NhanVien existing = nhanVienRepository.findById(maNV)
+                .orElseThrow(() -> new ResourceNotFoundException("NhanVien", "maNV", maNV));
+
+        if (existing.getUsername() != null && existing.getUsername().equalsIgnoreCase(currentUsername)) {
+            throw new BusinessConflictException("Không thể tự xóa tài khoản đang đăng nhập.");
+        }
+
+        if (existing.getTrangThaiLamViec() != TrangThaiLamViec.DA_NGHI_VIEC) {
+            throw new BusinessConflictException(
+                    "Chỉ có thể xóa vĩnh viễn nhân viên đã chuyển sang mục Nghỉ việc."
+            );
+        }
+
+        try {
+            nhanVienRepository.delete(existing);
+            nhanVienRepository.flush();
+        } catch (DataIntegrityViolationException ex) {
+            throw new BusinessConflictException(
+                    "Không thể xóa vĩnh viễn nhân viên '" + existing.getHoVaTen()
+                            + "' vì đang có dữ liệu liên kết trong hệ thống."
+            );
+        }
     }
 
     /**
